@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="cafeterias">
+        <item>옥류천</item>
+        <item>패컬티 (명륜)</item>
+        <item>은행골</item>
+        <item>금잔디</item>
+        <item>은행나무아래</item>
+        <item>법고을</item>
+        <item>패컬티 (율전)</item>
+        <item>학생회관</item>
+        <item>공대</item>
+    </string-array>
+</resources>

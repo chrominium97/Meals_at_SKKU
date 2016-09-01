@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="campus_yuljeon">율전</string>
+    <string name="campus_myeongryun">명륜</string>
+    <string name="campus">캠퍼스</string>
+    <string name="switched_to">%s 캠퍼스로 전환되었습니다</string>
+    <string name="error_retrieving">​식단 조회에 실패하였습니다</string>
+    <string name="about_desc">류호성, 황재운 제작</string>
+    <string name="action_about">정보</string>
+    <string name="title_activity_about">정보</string>
+    <string name="breakfast">아침</string>
+    <string name="dinner">저녁</string>
+    <string name="lunch">점심</string>
+    <string name="no_meal">식단이 없습니다</string>
+    <string name="no_internet">인터넷에 연결되어있지 않습니다</string>
+    <string name="etc">기타</string>
+</resources>
