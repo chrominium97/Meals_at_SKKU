@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/about"
         android:id="@+id/logo"
+        android:contentDescription="@string/logo"
         android:layout_margin="@dimen/fab_margin"/>
 
     <TextView
@@ -28,7 +29,7 @@
         android:layout_below="@+id/logo"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+        android:layout_margin="5dp"
         android:id="@+id/title" />
 
     <TextView

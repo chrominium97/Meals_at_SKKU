@@ -1,5 +1,6 @@
 package me.u67f3.mealsskku;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +39,9 @@ import java.util.TreeSet;
  * A placeholder fragment containing a simple view.
  */
 public class MealViewerFragment extends Fragment {
+
+    private static final String TAG = "MealViewerFragment";
+
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -63,9 +68,9 @@ public class MealViewerFragment extends Fragment {
     }
 
     public class Meal {
-        String title;
-        String type;
-        String description;
+        final String title;
+        final String type;
+        final String description;
 
         String getName() {
             return this.title;
@@ -86,19 +91,36 @@ public class MealViewerFragment extends Fragment {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public void updateData() {
+        updateData(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public void updateData(String date) {
+        try {
+            new SimpleDateFormat("yyyyMMdd").parse(date);
+        } catch (ParseException e) {
+            Log.w(TAG, "updateData: Invalid date string passed. Fallback to current date", e);
+        }
+
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "updateData: Network is connected...");
             new DownloadMealsTask().execute(
                     "http://skku-meals.azurewebsites.net/?" +
                             "cafeteria=" + getActivity().getResources().getIntArray(R.array.cafeteria_codes)[getArguments().getInt(ARG_SECTION_NUMBER)] +
-                            "&date=" + new SimpleDateFormat("yyyyMMdd").format(new Date())
+                            "&date=" + date
             );
         } else {
+            Log.w(TAG, "updateData: No internet connection...");
+
+            rootView.findViewById(R.id.progess_circle).setVisibility(View.GONE);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("No network connection available.");
+            textView.setText(getString(R.string.no_internet));
+            rootView.findViewById(R.id.error_dialog).setVisibility(View.VISIBLE);
         }
     }
 
@@ -141,7 +163,7 @@ public class MealViewerFragment extends Fragment {
                 InputStream inputStream = connection.getInputStream();
                 ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
                 byte[] byteBuffer = new byte[1024];
-                int nLength = 0;
+                int nLength;
                 while ((nLength = inputStream.read(byteBuffer, 0, byteBuffer.length)) != -1) {
                     byteOutputStream.write(byteBuffer, 0, nLength);
                 }
@@ -195,12 +217,16 @@ public class MealViewerFragment extends Fragment {
                                     String[] strings = {o1, o2};
                                     int[] values = {3, 3};
                                     for (int i = 0; i < strings.length; i++) {
-                                        if (strings[i].equals("breakfast")) {
-                                            values[i] = 0;
-                                        } else if (strings[i].equals("lunch")) {
-                                            values[i] = 1;
-                                        } else if (strings[i].equals("dinner")) {
-                                            values[i] = 2;
+                                        switch (strings[i]) {
+                                            case "breakfast":
+                                                values[i] = 0;
+                                                break;
+                                            case "lunch":
+                                                values[i] = 1;
+                                                break;
+                                            case "dinner":
+                                                values[i] = 2;
+                                                break;
                                         }
                                     }
                                     if (values[0] == -1 && values[1] == -1) {
@@ -251,6 +277,7 @@ public class MealViewerFragment extends Fragment {
                         }
 
                         @Override
+                        @SuppressLint("InflateParams")
                         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                             switch (viewType) {
                                 case TYPE_CARD_VIEW:

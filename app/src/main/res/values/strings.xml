@@ -19,4 +19,6 @@
     <string name="dinner">Dinner</string>
     <string name="etc">Etc.</string>
     <string name="no_meal">No meals</string>
+    <string name="logo">Logo</string>
+    <string name="error">Error</string>
 </resources>
