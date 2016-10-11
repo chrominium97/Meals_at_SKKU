@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -17,7 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DatePickerFragment.DateSetListener {
 
     private final String PREF_LAST_SELECTED_PAGE = "last_selected_page";
 
@@ -72,23 +73,13 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String text = getString(R.string.switched_to);
-                switch (mSectionsPagerAdapter.switchCampus()) {
-                    case SectionsPagerAdapter.YULJEON:
-                        text = text.replace("%s", getString(R.string.campus_yuljeon));
-                        break;
-                    case SectionsPagerAdapter.MYEONGRYUN:
-                        text = text.replace("%s", getString(R.string.campus_myeongryun));
-                        break;
-                }
-                tabLayout.setupWithViewPager(mViewPager);
-                Snackbar.make(view, text, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getSupportFragmentManager(), "timePicker");
             }
         });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -105,12 +96,39 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_about) {
-            startActivity(new Intent(this, AboutActivity.class));
-            return true;
+        switch (id) {
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                return true;
+            case R.id.switch_campus:
+                switchCampus();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDateSet(int year, int month, int day) {
+        mSectionsPagerAdapter.setDate(
+                String.valueOf(year) + String.valueOf(month + 1) +  String.valueOf(day));
+        mSectionsPagerAdapter.notifyDataSetChanged();
+    }
+
+    void switchCampus() {
+        View view = findViewById(R.id.fab);
+        String text = getString(R.string.switched_to);
+        switch (mSectionsPagerAdapter.switchCampus()) {
+            case SectionsPagerAdapter.YULJEON:
+                text = text.replace("%s", getString(R.string.campus_yuljeon));
+                break;
+            case SectionsPagerAdapter.MYEONGRYUN:
+                text = text.replace("%s", getString(R.string.campus_myeongryun));
+                break;
+        }
+        ((TabLayout) findViewById(R.id.tabs)).setupWithViewPager(mViewPager);
+        Snackbar.make(view, text, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 
     /**
@@ -118,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+
+        private String date = null;
 
         final private String PREF_SELECTED_CAMPUS = "selected_campus";
 
@@ -145,7 +165,9 @@ public class MainActivity extends AppCompatActivity {
             return this.campus;
         }
 
-
+        public void setDate(String date) {
+            this.date = date;
+        }
 
         @Override
         public Fragment getItem(int position) {
@@ -154,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             if (this.campus == YULJEON) {
                 position += 6;
             }
-            return MealViewerFragment.newInstance(position);
+            return MealViewerFragment.newInstance(position, date);
         }
 
         @Override

@@ -6,6 +6,7 @@
     <string name="campus_yuljeon">Yuljeon</string>
     <string name="campus">campus</string>
 
+    <string name="switch_campus">Switch campus</string>
     <string name="switched_to">Switched to %s campus</string>
 
     <string name="no_internet">No internet connection available</string>
